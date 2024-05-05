@@ -70,14 +70,15 @@ void deal_cards(Card deck[], Player players[]) {
     }
 }
 
+//
+
 // Function to deal first move
-/*
-void firstmove_die(){
-    for(int i = 0; i < 1; i++){
-        int die = rand() % (6 + 1 -0) + 0;
-    }
+void rollDie() {
+    int result = (rand() % 6) + 1;
+    printf("The player die rolled: %d\n", result);
 }
-*/
+
+
 int main() {
     Card deck[DECK_SIZE];
     Player players[NUM_PLAYERS];
@@ -92,6 +93,11 @@ int main() {
     // Game loop
     bool game_over = false;
     int current_player = 0;
+
+
+
+    // Intitiate first card
+
 
     while (!game_over) {
         // Player's turn logic
