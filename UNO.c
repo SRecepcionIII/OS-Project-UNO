@@ -6,7 +6,7 @@
 
 #define NUM_PLAYERS 2
 #define HAND_SIZE 7
-#define DECK_SIZE 108
+#define DECK_SIZE 40
 
 // Define colors and values for Uno cards
 typedef enum {
@@ -38,6 +38,7 @@ void init_deck(Card deck[]) {
     }
 
     // Special cards
+    /*
     char *special_card[] = {"skip", "reverse", "draw2", "draw4"};
     for (Color c = RED; c <= BLUE; c++){
         for(int i = 10; i <= 13; i++){
@@ -46,7 +47,7 @@ void init_deck(Card deck[]) {
             index++;
         }
     }
-
+    */
     // Implement this part based on Uno rules
 }
 
