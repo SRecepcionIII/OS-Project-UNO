@@ -8,7 +8,6 @@
 #include <sys/socket.h>
 
 #define PORT 8888
-#define SERVER_ADDR "127.0.0.1"
 #define MAX_CLIENTS 2
 #define NUM_PLAYERS 2
 #define HAND_SIZE 7
@@ -105,20 +104,6 @@ void player_turn(char *top_card, char player_hand[][16]) {
     execute_move(top_card, selected_card);
 }
 
-// Function to draw a card from the deck
-void draw_card(char *top_card, char *player_card) {
-    // Simulate drawing a card from the deck
-    // For now, let's just assume the player gets a random card
-    sprintf(player_card, "%s %s", Color[rand() % 4], Value[rand() % 16]);
-}
-
-// Function to handle drawing cards due to +2 or +4 cards
-void draw_cards(char *top_card, char player_hand[][16], int num_cards) {
-    for (int i = 0; i < num_cards; i++) {
-        draw_card(top_card, player_hand[i]);
-    }
-}
-
 // Function to handle game over condition
 bool is_game_over(char player_hand[][16]) {
     for (int i = 0; i < HAND_SIZE; i++) {
@@ -151,7 +136,7 @@ int main() {
     }
     
     // Listen for incoming connections
-    if (listen(server_fd, 3) < 0) {
+    if (listen(server_fd, MAX_CLIENTS) < 0) {
         perror("listen");
         exit(EXIT_FAILURE);
     }
