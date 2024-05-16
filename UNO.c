@@ -5,67 +5,43 @@
 #include <string.h>
 
 #define NUM_PLAYERS 2
-#define HAND_SIZE 7
-#define DECK_SIZE 40
 
-// Define colors and values for Uno cards
-typedef enum {
-    RED, YELLOW, GREEN, BLUE
-} Color;
+int HAND_SIZE = 7;
+int DECK_SIZE = 40;
 
-typedef struct {
-    Color color;
-    int value; // For regular cards: 0-9, for special cards: 10-13
-} Card;
-
-// Define player structure
-typedef struct {
-    Card hand[HAND_SIZE];
-    int hand_size;
-} Player;
+char *Color[4] = {"Red", "Yellow" , "Green", "Blue"};
+char *Value[16] = {"0","1","2","3","4","5","6","7","8","9","Cancel","Skip","Reverse","Wild","+2","+4"};
+char Card[4][16];
+char Deck[64];
+char PlayerCard[7];
+//char Discard[];
 
 // Function to initialize the Uno deck
-void init_deck(Card deck[]) {
-    int index = 0;
-
-    // Regular cards
-    for (Color c = RED; c <= BLUE; c++) {
-        for (int value = 0; value <= 9; value++) {
-            deck[index].color = c;
-            deck[index].value = value;
-            index++;
+void init_deck() {
+    for (int y = 0; y <= 3; y++) {
+        for (int i = 0; i <= 15; i++) {
+            //printf("Color: %s \n Value: %s \n\n", Color[y], Value[i]);
+            Card[y][i] = {{Color[y]}, {Color[i]}};
+            printf("Color: %s \n Value: %s \n\n", Card[y], Card[i]);
         }
     }
-
-    // Special cards
-    /*
-    char *special_card[] = {"skip", "reverse", "draw2", "draw4"};
-    for (Color c = RED; c <= BLUE; c++){
-        for(int i = 10; i <= 13; i++){
-            deck[index].color = c;
-            deck[index].value = i;
-            index++;
-        }
-    }
-    */
-    // Implement this part based on Uno rules
 }
-
+/*
 // Function to shuffle the Uno deck
-void shuffle_deck(Card deck[]) {
+void shuffle_deck(Deck[]) {
     srand(time(NULL));
     for (int i = 0; i < DECK_SIZE; i++) {
         int j = rand() % DECK_SIZE;
-        Card temp = deck[i];
-        deck[i] = deck[j];
-        deck[j] = temp;
+        Card temp = Deck[i];
+        Deck[i] = Deck[j];
+        Deck[j] = temp;
     }
 }
 
 // Function to deal cards to players
 void deal_cards(Card deck[], Player players[]) {
-    int card_index = 0;
-    for (int i = 0; i < NUM_PLAYERS; i++) {
+    int card_index = 1;
+    for (int i =  0; i < NUM_PLAYERS; i++) {
         for (int j = 0; j < HAND_SIZE; j++) {
             players[i].hand[j] = deck[card_index];
             card_index++;
@@ -126,12 +102,51 @@ void player_turn(Player *player, Card *top_card) {
     execute_move(top_card, player, move_index);
 }
 
+void current_top(int top_color, int top_num){
+    char convColor;
+    
+    switch (top_color)
+    {
+    case 0:
+        convColor = "RED";
+        break;
+    case 1:
+        convColor = "Yellow";
+        break;
+    case 2:
+        convColor = "RED";
+        break;
+    case 3:
+        convColor = "RED";
+        break;
+    default:
+        break;
+    }
+
+    printf("Top card: (%s,%d)\n", convColor, top_num);
+}
+*/
+
+/*
+void testrun(){
+    int n = 0;
+    while (n != 64)
+    {
+        printf("Card %d \n", Deck[n]);
+        n++;
+    }
+}
+*/
+
 int main() {
-    Card deck[DECK_SIZE];
-    Player players[NUM_PLAYERS];
+
 
     // Initialize deck and shuffle
-    init_deck(deck);
+    init_deck();
+
+    //testrun();
+
+    /*
     shuffle_deck(deck);
 
     // Deal cards to players
@@ -146,9 +161,11 @@ int main() {
 
     while (!game_over) {
         Player *current = &players[current_player];
-
+     
         // Display current top card
-        printf("Top card: (%d,%d)\n", top_card.color, top_card.value);
+        current_top(top_card.color, top.card.value);
+        
+
 
         // Player's turn logic
         player_turn(current, &top_card);
@@ -166,7 +183,8 @@ int main() {
 
         // Move to the next player
         current_player = (current_player + 1) % NUM_PLAYERS;
-    }
+    }*/
+
 
     return 0;
 }
