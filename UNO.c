@@ -18,11 +18,12 @@ char PlayerCard[7];
 
 // Function to initialize the Uno deck
 void init_deck() {
-    for (int y = 0; y <= 3; y++) {
-        for (int i = 0; i <= 15; i++) {
-            //printf("Color: %s \n Value: %s \n\n", Color[y], Value[i]);
-            Card[y][i] = {{Color[y]}, {Color[i]}};
-            printf("Color: %s \n Value: %s \n\n", Card[y], Card[i]);
+    int index = 0;
+    for (int color = 0; color < 4; color++) {
+        for (int value = 0; value < 16; value++) {
+            sprintf(Card[index], "%s %s", Color[color], Value[value]);
+            //printf("Card %d: %s\n", index+1, Card[index]);
+            index++;
         }
     }
 }
