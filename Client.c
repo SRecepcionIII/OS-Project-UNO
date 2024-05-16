@@ -85,27 +85,7 @@ int main() {
 
     // Receive player's hand from server
     receive_hand(sock, hand);
-
-    // Game loop
-    while (1) {
-        // Display player's hand
-        printf("Your hand: ");
-        for (int i = 0; i < HAND_SIZE; i++) {
-            printf("%s ", hand[i]);
-        }
-        printf("\n");
-
-        // Get player's move
-        char move[32];
-        printf("Enter your move: ");
-        scanf("%s", move);
-
-        // Send player's move to server
-        send_move(sock, move);
-
-        // Receive updated hand from server
-        receive_hand(sock, hand);
-
+    
 // Game loop
     while (1) {
         // Display player's hand
