@@ -8,20 +8,17 @@
 #define PORT 8888
 #define SERVER_ADDR "127.0.0.1"
 
-// Uno game logic functions and structures (to be implemented)
 #define HAND_SIZE 7
-#define MOVE_SIZE 32
 
 // Function to receive player's hand from server
-void receive_hand(int sock, char hand[][MOVE_SIZE]) {
+void receive_hand(int sock, char hand[][32]) {
     char buffer[1024] = {0};
     read(sock, buffer, sizeof(buffer));
-    printf("%s\n", buffer);
+    printf("Your hand: %s\n", buffer);
     char *token = strtok(buffer, " ");
     int i = 0;
     while (token != NULL && i < HAND_SIZE) {
-        strncpy(hand[i], token, MOVE_SIZE - 1);
-        hand[i][MOVE_SIZE - 1] = '\0'; // Ensure null-termination
+        strcpy(hand[i], token);
         token = strtok(NULL, " ");
         i++;
     }
@@ -53,9 +50,19 @@ int is_valid_move(char *move, char *top_card) {
     return 0;
 }
 
+// Function to declare UNO
+int declare_uno(char hand[][32], int hand_size) {
+    // Check if player has only one card left
+    if (hand_size == 1) {
+        return 1;
+    }
+    return 0;
+}
+
 int main() {
     int sock = 0;
     struct sockaddr_in serv_addr;
+    char hand[HAND_SIZE][32];
 
     // Create client socket
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -67,7 +74,7 @@ int main() {
     serv_addr.sin_port = htons(PORT);
 
     // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, SERVER_ADDR, &serv_addr.sin_addr) <= 0) {
+    if(inet_pton(AF_INET, SERVER_ADDR, &serv_addr.sin_addr)<=0) {
         perror("invalid address");
         return -1;
     }
@@ -77,16 +84,13 @@ int main() {
         perror("connection failed");
         return -1;
     }
-    
+
     printf("Connected to server\n");
-    
-    // Uno game setup
-    char hand[HAND_SIZE][MOVE_SIZE];
 
     // Receive player's hand from server
     receive_hand(sock, hand);
-    
-// Game loop
+
+    // Game loop
     while (1) {
         // Display player's hand
         printf("Your hand: ");
@@ -96,45 +100,23 @@ int main() {
         printf("\n");
 
         // Get player's move
-        char move[MOVE_SIZE];
+        char move[32];
         printf("Enter your move: ");
         if (fgets(move, sizeof(move), stdin) == NULL) {
-            perror("error reading input");
-            return -1;
+            perror("input error");
+            break;
         }
-        // Remove newline character if present
-        size_t len = strlen(move);
-        if (len > 0 && move[len - 1] == '\n') {
-            move[len - 1] = '\0';
-        }
-
-        // Validate move length
-        if (strlen(move) >= MOVE_SIZE) {
-            printf("Move is too long.\n");
-            continue;
-        }
+        move[strcspn(move, "\n")] = '\0'; // Remove trailing newline
 
         // Send player's move to server
         send_move(sock, move);
 
-        // Receive updated hand from server
+        // Optionally receive updated hand from server
         receive_hand(sock, hand);
 
         // Check for Uno
         if (declare_uno(hand, HAND_SIZE)) {
             printf("UNO!\n");
-        }
-        int i;
-        int end_game = 0;
-        for (i = 0; i < HAND_SIZE; i++) {
-            if (strcmp(hand[i], "") != 0) {
-                end_game = 1;
-                break;
-            }
-        }
-        if (!end_game) {
-            printf("You win!\n");
-            break;
         }
     }
 
