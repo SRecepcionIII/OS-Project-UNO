@@ -19,6 +19,7 @@ char *Value[16] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Cancel", "
 char Deck[40][16];
 char PlayerCard[7];
 
+// Function to initialize the Uno deck
 void init_deck() {
     int card_index = 0;
     for (int color_index = 0; color_index < 4; color_index++) {
@@ -29,6 +30,7 @@ void init_deck() {
     }
 }
 
+// Function to shuffle the Uno deck
 void shuffle_deck(char deck[][16]) {
     srand(time(NULL));
     for (int i = 0; i < DECK_SIZE; i++) {
@@ -40,6 +42,7 @@ void shuffle_deck(char deck[][16]) {
     }
 }
 
+// Function to deal cards to players
 void deal_cards(char deck[][16], char players[][7][16]) {
     int card_index = 0;
     for (int i = 0; i < NUM_PLAYERS; i++) {
@@ -50,12 +53,80 @@ void deal_cards(char deck[][16], char players[][7][16]) {
     }
 }
 
+// Function to display player's hand
 void display_hand(char player_hand[][16]) {
     printf("Your hand: ");
     for (int i = 0; i < HAND_SIZE; i++) {
         printf("%s ", player_hand[i]);
     }
     printf("\n");
+}
+
+// Function to check if a player's move is valid
+bool is_valid_move(char *top_card, char *player_card) {
+    char top_color[16];
+    char top_value[16];
+    char player_color[16];
+    char player_value[16];
+    
+    sscanf(top_card, "%s %s", top_color, top_value);
+    sscanf(player_card, "%s %s", player_color, player_value);
+    
+    return (strcmp(top_color, player_color) == 0 || strcmp(top_value, player_value) == 0);
+}
+
+// Function to execute player's move
+void execute_move(char *top_card, char *player_card) {
+    strcpy(top_card, player_card);
+}
+
+// Function to handle player's turn
+void player_turn(char *top_card, char player_hand[][16]) {
+    printf("It's your turn!\n");
+    display_hand(player_hand);
+    printf("Enter the index of the card you want to play: ");
+    int move_index;
+    scanf("%d", &move_index);
+
+    if (move_index < 0 || move_index >= HAND_SIZE) {
+        printf("Invalid index. Please try again.\n");
+        player_turn(top_card, player_hand);
+        return;
+    }
+
+    char selected_card[16];
+    strcpy(selected_card, player_hand[move_index]);
+    if (!is_valid_move(top_card, selected_card)) {
+        printf("Invalid move. Please try again.\n");
+        player_turn(top_card, player_hand);
+        return;
+    }
+
+    execute_move(top_card, selected_card);
+}
+
+// Function to draw a card from the deck
+void draw_card(char *top_card, char *player_card) {
+    // Simulate drawing a card from the deck
+    // For now, let's just assume the player gets a random card
+    sprintf(player_card, "%s %s", Color[rand() % 4], Value[rand() % 16]);
+}
+
+// Function to handle drawing cards due to +2 or +4 cards
+void draw_cards(char *top_card, char player_hand[][16], int num_cards) {
+    for (int i = 0; i < num_cards; i++) {
+        draw_card(top_card, player_hand[i]);
+    }
+}
+
+// Function to handle game over condition
+bool is_game_over(char player_hand[][16]) {
+    for (int i = 0; i < HAND_SIZE; i++) {
+        if (strcmp(player_hand[i], "") != 0) {
+            return false;
+        }
+    }
+    return true;
 }
 
 int main() {
@@ -109,6 +180,28 @@ int main() {
     for (int i = 0; i < NUM_PLAYERS; i++) {
         printf("Player %d's hand: ", i + 1);
         display_hand(players[i]);
+    }
+
+    // Main game loop
+    int current_player = 0;
+    while (!is_game_over(players[current_player])) {
+        char top_card[16];
+        strcpy(top_card, Deck[0]); // Initialize top card
+        
+        // Display current top card
+        printf("Top card: %s\n", top_card);
+
+        // Player's turn logic
+        player_turn(top_card, players[current_player]);
+
+        // Check for game over condition
+        if (is_game_over(players[current_player])) {
+            printf("Player %d wins!\n", current_player + 1);
+            break;
+        }
+
+        // Move to the next player
+        current_player = (current_player + 1) % NUM_PLAYERS;
     }
 
     // Close all client sockets
