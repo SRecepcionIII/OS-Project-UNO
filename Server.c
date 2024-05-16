@@ -46,8 +46,7 @@ void display_hand(char *hand[], int size) {
 }
 
 // Function to handle player's turn
-void player_turn(int client_socket, char hand[][32]) {
-    // Send player's hand to client
+void player_turn(int client_socket, char hand[][32], char *top_card) {
     char buffer[1024] = {0};
     sprintf(buffer, "Your hand: ");
     for (int i = 0; i < HAND_SIZE; i++) {
@@ -56,10 +55,24 @@ void player_turn(int client_socket, char hand[][32]) {
     }
     send(client_socket, buffer, strlen(buffer), 0);
 
-    // Receive player's move
+    // Send the top card to the client for reference
+    send(client_socket, top_card, strlen(top_card), 0);
+
     char move[32];
     recv(client_socket, move, sizeof(move), 0);
     printf("Player move: %s\n", move);
+
+    // Check if the move is valid
+    if (is_valid_move(move, top_card)) {
+        // Update game state if the move is valid
+        execute_move(move, hand);
+        // Acknowledge the move
+        send(client_socket, "Valid move", strlen("Valid move"), 0);
+    } else {
+        // Inform the player of an invalid move
+        send(client_socket, "Invalid move", strlen("Invalid move"), 0);
+        // Optionally, you can prompt the player to make another move
+    }
 }
 
 // Function to check if a move is valid
@@ -167,18 +180,10 @@ int main() {
     deal_cards(deck, player_hands);
 
     // Game loop
-    int client_sockets[MAX_CLIENTS] = {0};
     for (int i = 0; i < MAX_CLIENTS; i++) {
-        // Accept incoming connections
-        if ((client_sockets[i] = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
-            perror("accept");
-            exit(EXIT_FAILURE);
-        }
-        printf("Client %d connected\n", i+1);
-
         // Handle player's turn
         char player_hand[HAND_SIZE][32];
-        deal_cards(NULL, player_hand);  // Placeholder for dealing cards
+        memcpy(player_hand, player_hands[i], sizeof(player_hand));
         player_turn(client_sockets[i], player_hand);
     }
 
